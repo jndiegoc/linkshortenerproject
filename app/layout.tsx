@@ -1,6 +1,15 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import {
+  ClerkProvider,
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from "@clerk/nextjs";
 import "./globals.css";
+import DarkModeToggle from "../components/DarkModeToggle";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,12 +32,27 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `(function(){try{const t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark')}else{document.documentElement.classList.remove('dark')}}catch(e){}})()`,
+            }}
+          />
+          <header className="flex items-center justify-end gap-4 p-4">
+            <DarkModeToggle />
+            <SignedOut>
+              <SignInButton />
+              <SignUpButton />
+            </SignedOut>
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
+          </header>
+          {children}
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
